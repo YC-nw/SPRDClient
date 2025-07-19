@@ -1,12 +1,9 @@
 ﻿using Microsoft.Win32;
 using SPRDClient.Utils;
-using SPRDClientCore;
 using System.ComponentModel;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Wpf.Ui;
 using Wpf.Ui.Controls;
 
 namespace SPRDClient.Pages
@@ -249,12 +246,12 @@ namespace SPRDClient.Pages
                             flashModel.EnableDmButton_Click(sender, e);
                             break;
                         case "recovery":
-                            flashModel.ResetToRecoveryButton_Click(sender,e);
+                            flashModel.ResetToRecoveryButton_Click(sender, e);
                             break;
                         case "fastbootd":
                             flashModel.ResetToFastbootdButton_Click(sender, e);
                             break;
-                        case "factory reset": 
+                        case "factory reset":
                             flashModel.FactoryResetButton_Click(sender, e);
                             break;
                     }

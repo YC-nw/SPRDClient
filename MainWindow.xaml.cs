@@ -1,11 +1,10 @@
-﻿using System.Windows;
+﻿using SPRDClient.Utils;
 using System.IO;
-using SPRDClientCore;
+using System.Windows;
 using System.Xml.Serialization;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Extensions;
-using SPRDClient.Utils;
 
 namespace SPRDClient
 {
@@ -27,15 +26,20 @@ namespace SPRDClient
         public string FdlFilePath { get; set; } = "";
         public bool AutoSendNextTime { get; set; }
         public bool EnableReconnectMode { get; set; } = false;
-        public bool KickToAutodloader { get => field; set { 
+        public bool KickToAutodloader
+        {
+            get => field; set
+            {
                 field = value;
-                if (value) { 
+                if (value)
+                {
                     AnimationControl.StartFadeInAnimation(KickModeToggle);
                     snackbarService.Show("警告", "此功能在某些设备上无法正常工作\n且在某些设备上会使splloader分区被擦除\n请谨慎使用！", ControlAppearance.Caution, new TimeSpan(0, 0, 3));
                 }
                 else AnimationControl.StartFadeOutAnimation(KickModeToggle);
-            } } = false;
-        public bool boolKickMode {  get => field; set { field = value;KickMode = value ? ModeOfChangingDiagnostic.CustomOneTimeMode : ModeOfChangingDiagnostic.CommonMode; } }
+            }
+        } = false;
+        public bool boolKickMode { get => field; set { field = value; KickMode = value ? ModeOfChangingDiagnostic.CustomOneTimeMode : ModeOfChangingDiagnostic.CommonMode; } }
         private ModeOfChangingDiagnostic KickMode = ModeOfChangingDiagnostic.CommonMode;
         public bool AutoSend
         {
@@ -151,8 +155,8 @@ namespace SPRDClient
                {
                    try
                    {
-                       if(DeviceConnected)
-                       sprdProtocolHandler?.Dispose();
+                       if (DeviceConnected)
+                           sprdProtocolHandler?.Dispose();
                    }
                    catch (Exception) { }
                });
@@ -181,9 +185,9 @@ namespace SPRDClient
                     {
                         Dispatcher.BeginInvoke(() => WaitingLabel.Text = $"正在连接端口{port}");
                         if (!sprdProtocolHandler.TryConnectChannel(port)) throw new InvalidOperationException($"连接端口{port}失败");
-                        Dispatcher.BeginInvoke(() => snackbarService.Show("通知", $"成功连接端口{port}", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Connected16), new TimeSpan(0, 0, 0, 1,800)));
+                        Dispatcher.BeginInvoke(() => snackbarService.Show("通知", $"成功连接端口{port}", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Connected16), new TimeSpan(0, 0, 0, 1, 800)));
                     }
-                        bool isDisconnected = false;
+                    bool isDisconnected = false;
                     comPortMonitor = new(port, async () =>
                     {
                         if (!isDisconnected)

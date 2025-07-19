@@ -1,25 +1,9 @@
-﻿using SPRDClientCore;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Wpf.Ui.Controls;
-using SPRDClient.Pages;
-using static SPRDClient.FlashWindow;
-using Wpf.Ui;
-using Wpf.Ui.Extensions;
-using System.Windows.Media.Effects;
+﻿using SPRDClient.Pages;
 using SPRDClient.Utils;
+using System.Windows;
+using System.Windows.Media.Effects;
+using Wpf.Ui;
+using Wpf.Ui.Controls;
 
 namespace SPRDClient
 {
@@ -59,8 +43,8 @@ namespace SPRDClient
             snackbarService.SetSnackbarPresenter(RootSnackbarPresenter);
             contentDialogService = new ContentDialogService();
             contentDialogService.SetDialogHost(RootContentPresenter);
-            flashModel = new(flashUtils,snackbarService,contentDialogService,RootGrid);
-            homePage = new HomePage(flashUtils,flashModel, snackbarService,contentDialogService) { RootGrid = RootGrid};
+            flashModel = new(flashUtils, snackbarService, contentDialogService, RootGrid);
+            homePage = new HomePage(flashUtils, flashModel, snackbarService, contentDialogService) { RootGrid = RootGrid };
             settingsPage = new SettingsPage(flashModel);
             seniorPage = new(flashModel);
             string? temp = Application.ResourceAssembly?.GetName()?.Version?.ToString();
@@ -73,13 +57,14 @@ namespace SPRDClient
                 Dispatcher.Invoke(async () =>
                 {
                     RootGrid.Effect = new BlurEffect() { Radius = 10 };
-                    ContentDialog contentDialog = new ContentDialog() {
-                         CloseButtonIcon = new SymbolIcon(SymbolRegular.ArrowExit20),
-                         CloseButtonText = "退出程序",
-                         Title = "严重警告",
-                         Content = "检测到设备已断开连接",
+                    ContentDialog contentDialog = new ContentDialog()
+                    {
+                        CloseButtonIcon = new SymbolIcon(SymbolRegular.ArrowExit20),
+                        CloseButtonText = "退出程序",
+                        Title = "严重警告",
+                        Content = "检测到设备已断开连接",
                     };
-                    await contentDialogService.ShowAsync(contentDialog,CancellationToken.None);
+                    await contentDialogService.ShowAsync(contentDialog, CancellationToken.None);
                     Application.Current.Shutdown();
                 });
             });

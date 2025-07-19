@@ -1,17 +1,5 @@
-﻿using System;
-using System.Threading.Channels;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Threading.Channels;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace SPRDClient.Pages
@@ -41,7 +29,7 @@ namespace SPRDClient.Pages
             Task.Run(PacketConsumeLogAsync);
             Task.Run(CommonConsumeLogAsync);
         }
-        
+
         public void PacketLog(string message)
         {
             _packetLogChannel.Writer.TryWrite(message);
@@ -52,12 +40,13 @@ namespace SPRDClient.Pages
         }
         private async Task PacketConsumeLogAsync()
         {
-            await foreach (var message in _packetLogChannel.Reader.ReadAllAsync()) {
+            await foreach (var message in _packetLogChannel.Reader.ReadAllAsync())
+            {
                 await PacketTextLog.Dispatcher.BeginInvoke(() =>
                 {
-                    if(PacketTextLog.Text.Length >= 3000)
+                    if (PacketTextLog.Text.Length >= 3000)
                         PacketTextLog.Clear();
-                   
+
                     PacketTextLog.AppendText($"{DateTime.Now.ToString("yyyy/MM/dd:HH:mm:ss")} : {message}{Environment.NewLine}");
                     PacketTextLog.ScrollToEnd();
                 }, DispatcherPriority.ContextIdle);
@@ -65,7 +54,8 @@ namespace SPRDClient.Pages
         }
         private async Task CommonConsumeLogAsync()
         {
-            await foreach (var message in _commonLogChannel.Reader.ReadAllAsync()) {
+            await foreach (var message in _commonLogChannel.Reader.ReadAllAsync())
+            {
                 await CommonTextLog.Dispatcher.BeginInvoke(() =>
                 {
                     if (CommonTextLog.Text.Length >= 1000) CommonTextLog.Clear();
