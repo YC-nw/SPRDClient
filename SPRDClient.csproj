@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <LangVersion>preview</LangVersion>
+    <Platforms>AnyCPU;x86</Platforms>
+    <Version>1.0</Version>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="新文件夹1\**" />
+    <EmbeddedResource Remove="新文件夹1\**" />
+    <None Remove="新文件夹1\**" />
+    <Page Remove="新文件夹1\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.IO.Ports" Version="9.0.6" />
+    <PackageReference Include="System.Management" Version="9.0.6" />
+    <PackageReference Include="WPF-UI" Version="4.0.2" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  </Target>
+</Project>

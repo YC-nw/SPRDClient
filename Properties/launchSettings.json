@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SPRDClient": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}
