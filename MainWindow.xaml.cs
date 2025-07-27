@@ -15,7 +15,7 @@ namespace SPRDClient
 
     public partial class MainWindow
     {
-        SprdFlashUtils sprdFlashUtils;
+        public SprdFlashUtils sprdFlashUtils;
         SprdProtocolHandler sprdProtocolHandler;
         const string configPath = "fdlToSend.xml";
         ExitEventHandler exitEventHandler;
@@ -45,6 +45,29 @@ namespace SPRDClient
         {
             get; set;
         }
+        public string ExecAddressFilePath
+        {
+            get; set;
+        } = "";
+        public string ExecAddressStr
+        {
+            get => field;
+            set
+            {
+                field = value;
+                execAddress = (uint)SprdFlashUtils.StringToSize(value);
+            }
+        } = "";
+        bool IsAbleToSendExecAddr
+        {
+            get
+            {
+                if (!File.Exists(ExecAddressFilePath) || string.IsNullOrWhiteSpace(ExecAddressStr)) return false;
+                if (execAddress == 0) return false;
+                return true;
+            }
+        }
+        uint execAddress;
         public class Config
         {
             public string Fdl1ToSendPath { get; set; } = string.Empty;
@@ -97,13 +120,41 @@ namespace SPRDClient
             get => field;
             set
             {
-                if (value == Stages.Fdl2) OnFdl2Stage();
+                switch (value)
+                {
+                    case Stages.Brom:
+                        IsExecAddrHidden = false;
+                        break;
+                    case Stages.Fdl1:
+                        IsExecAddrHidden = true;
+                        Dispatcher.BeginInvoke(() => Height = Height == 700 ? 600 : Height);
+                        break;
+                    case Stages.Fdl2:
+                        OnFdl2Stage();
+                        break;
+                }
                 Dispatcher.Invoke(() =>
                 {
                     field = value;
                     StageTextBlock.Text = value.ToString();
                     AnimationControl.StartFadeOutAnimation(ProgressRing1, 0.3);
                     AnimationControl.StartFadeOutAnimation(ProgressText1, 0.3);
+                });
+            }
+        }
+        bool IsExecAddrHidden
+        {
+            get => field;
+            set
+            {
+                field = value;
+                var visibility = value ? Visibility.Collapsed : Visibility.Visible;
+                Dispatcher.BeginInvoke(() =>
+                {
+                        ed0.Visibility = visibility;
+                        ed1.Visibility = visibility;
+                        ed2.Visibility = visibility;
+                        ed3.Visibility = visibility;
                 });
             }
         }
@@ -199,7 +250,6 @@ namespace SPRDClient
                         }
                     });
                     sprdProtocolHandler.Timeout = 1000;
-                    sprdProtocolHandler.Verbose = true;
                     var temp = sprdFlashUtils.ConnectToDevice(EnableReconnectMode);
                     Dispatcher.BeginInvoke(() => AnimationControl.StartFadeOutAnimation(WaitingPanel));
                     SprdVersion = temp.SprdMode;
@@ -304,12 +354,16 @@ namespace SPRDClient
                         config.Fdl2ToSendAddress = StrAddress;
                         break;
                 }
-
+                sprdFlashUtils.Timeout = 10000;
                 sprdFlashUtils.SendFile(File.OpenRead(FdlFilePath), (uint)address);
-                Dispatcher.BeginInvoke(() => snackbarService.Show($"{Stage.ToString()}阶段操作成功", $"已发送{Path.GetFileName(FdlFilePath)}", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Send16), new TimeSpan(0, 0, 0, 1, 700)));
+                if (Stage == Stages.Brom && IsAbleToSendExecAddr)
+                {
+                    sprdFlashUtils.SendFile(File.OpenRead(ExecAddressFilePath), execAddress, sendEndData: false);
+                }
+                Dispatcher.BeginInvoke(() => snackbarService.Show($"{Stage}阶段操作成功", $"已发送{Path.GetFileName(FdlFilePath)}{(Stage == Stages.Brom && IsAbleToSendExecAddr ? $"及{Path.GetFileName(ExecAddressFilePath)}" : "")}", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Send16), new TimeSpan(0, 0, 0, 1, 700)));
                 sprdFlashUtils.ExecuteDataAndConnect(Stage);
                 Stage++;
-                Dispatcher.BeginInvoke(() => snackbarService.Show($"{Stage.ToString()}阶段操作成功", $"已连接{Stage.ToString()}", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Send16), new TimeSpan(0, 0, 0, 1, 700)));
+                Dispatcher.BeginInvoke(() => snackbarService.Show($"{Stage}阶段操作成功", $"已连接{Stage}", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Send16), new TimeSpan(0, 0, 0, 1, 700)));
 
                 Dispatcher.Invoke(() => SendFdlButton.IsEnabled = true);
             });

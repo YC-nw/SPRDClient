@@ -96,7 +96,7 @@
                 <ui:TextBlock>高级日志</ui:TextBlock>
             </ui:ToggleSwitch>
             <ui:ToggleSwitch Margin="5" IsChecked="{Binding UseAsyncSpeedUp, UpdateSourceTrigger=PropertyChanged}">
-                <ui:TextBlock>使用异步加速（显著提高cpu和内存占用，但效果明显）</ui:TextBlock>
+                <ui:TextBlock>使用多线程加速（显著提高cpu和内存占用，但效果明显）</ui:TextBlock>
             </ui:ToggleSwitch>
             <ui:ToggleSwitch Margin="5" IsEnabled="{Binding IsUsingNewFdl2}" IsChecked="{Binding SkipSignVerify, UpdateSourceTrigger=PropertyChanged}">
                 <ui:TextBlock >写入分区无视签名校验（仅在新fdl上支持）</ui:TextBlock>

@@ -54,7 +54,7 @@
             MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}}"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
-            BorderThickness="0.5"
+            BorderThickness="0.15"
             ScrollViewer.CanContentScroll="True"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             Visibility="Hidden">
@@ -127,8 +127,7 @@
                 Value="0">
                 <ProgressBar.Foreground>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Offset="0" Color="Plum" />
-                        <GradientStop Offset="0.5" Color="LightSalmon" />
+                        <GradientStop Offset="0.5" Color="LightGreen" />
                         <GradientStop Offset="1" Color="LightGoldenrodYellow" />
                     </LinearGradientBrush>
                 </ProgressBar.Foreground>
@@ -178,26 +177,16 @@
                     Margin="5"
                     Click="PowerOnButton_Click"
                     Content="开机"
-                    Icon="{ui:SymbolIcon Symbol=Power20}">
-                    <ui:Button.Background>
-                        <LinearGradientBrush>
-                            <GradientStop Offset="0" Color="LightGreen" />
-                            <GradientStop Offset="1" Color="LightBlue" />
-                        </LinearGradientBrush>
-                    </ui:Button.Background>
+                    Icon="{ui:SymbolIcon Symbol=Power20}"
+                    Background="LightGreen">
                 </ui:Button>
                 <ui:Button
                     Width="80"
                     Margin="5"
                     Click="PowerOffButton_Click"
                     Content="关机"
-                    Icon="{ui:SymbolIcon Symbol=Power20}">
-                    <ui:Button.Background>
-                        <LinearGradientBrush StartPoint="1,1" EndPoint="0,0">
-                            <GradientStop Offset="0" Color="Wheat" />
-                            <GradientStop Offset="1" Color="PaleVioletRed" />
-                        </LinearGradientBrush>
-                    </ui:Button.Background>
+                    Icon="{ui:SymbolIcon Symbol=Power20}"
+                    Background="PaleVioletRed">
                 </ui:Button>
             </WrapPanel>
         </Border>

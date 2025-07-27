@@ -23,24 +23,17 @@
             HorizontalAlignment="Right"
             Panel.ZIndex="101" />
         <ContentPresenter x:Name="RootContentPresenter" Panel.ZIndex="100" />
-        <Grid x:Name="RootGrid">
+        <Grid Background="AliceBlue" x:Name="RootGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="32" />
                 <!--  TitleBar  -->
                 <RowDefinition Height="*" />
                 <!--  读取分区  -->
             </Grid.RowDefinitions>
-            <Grid.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                    <GradientStop Offset="0" Color="LightBlue" />
-                    <GradientStop Offset="0.2" Color="LightGoldenrodYellow" />
-                    <GradientStop Offset="1.8" Color="LightGreen" />
-                </LinearGradientBrush>
-            </Grid.Background>
             <!--  TitleBar  -->
             <ui:TitleBar
                 x:Name="TitleBar1"
-                Title="SPRDClient Developer : YC &amp;&amp; la1N "
+                Title="SPRDClient Developer : YC &amp;&amp; la1N FinalVersion (Maybe?) "
                 Grid.Row="0"
                 Cursor="Hand"
                 FontSize="15"

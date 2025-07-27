@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
+using static SPRDClient.Utils.FlashModel;
 
 namespace SPRDClient.Pages
 {
@@ -21,25 +22,16 @@ namespace SPRDClient.Pages
         public Grid? RootGrid;
 
 
-        public struct PartitionDisplay
-        {
-            public PartitionDisplay(Partition partition)
-            {
-                Name = partition.Name;
-                DisplaySize = (int)Math.Ceiling((decimal)partition.Size / (1UL << partition.IndicesToMB));
-            }
-            public string Name { get; set; }
-            public int DisplaySize { get; set; }
-        }
-        private ObservableCollection<PartitionDisplay> DisplayPartitions = new ObservableCollection<PartitionDisplay>();
-        private SprdFlashUtils sprdFlashUtils;
-        private FlashModel flashModel;
+        private readonly ObservableCollection<PartitionDisplay> displayPartitions;
+        private readonly SprdFlashUtils sprdFlashUtils;
+        private readonly FlashModel flashModel;
         public HomePage(SprdFlashUtils sprdFlash, FlashModel flashModel, SnackbarService snackbarService, ContentDialogService contentDialogService)
         {
             InitializeComponent();
             this.snackbarService = snackbarService;
             this.contentDialogService = contentDialogService;
-            PartitionsListView.ItemsSource = DisplayPartitions;
+            displayPartitions = flashModel.DisplayPartitions;
+            PartitionsListView.ItemsSource = displayPartitions;
             sprdFlashUtils = sprdFlash;
             this.flashModel = flashModel;
             flashModel.Timeout = 10000;
@@ -57,7 +49,7 @@ namespace SPRDClient.Pages
         }
         private void HomePage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (DisplayPartitions.Count == 0)
+            if (displayPartitions.Count == 0)
             {
                 snackbarService.Show("Fdl2阶段操作成功", $"已连接Fdl2", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Connected16), new TimeSpan(0, 0, 0, 2));
                 LoadPartitionsAsync();
@@ -95,7 +87,7 @@ namespace SPRDClient.Pages
                     {
                         foreach (var partition in flashModel.partitions)
                         {
-                            this.DisplayPartitions.Add(new PartitionDisplay(partition));
+                            displayPartitions.Add(new PartitionDisplay(partition));
                         }
                     }));
                     Dispatcher.BeginInvoke(() =>
@@ -166,6 +158,5 @@ namespace SPRDClient.Pages
         }
 
         #endregion
-
     }
 }

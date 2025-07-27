@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -7,7 +8,6 @@ using System.Windows.Media.Effects;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Extensions;
-using static SPRDClient.Pages.HomePage;
 
 namespace SPRDClient.Utils
 {
@@ -31,8 +31,6 @@ namespace SPRDClient.Utils
                 IsUsingNewFdl2 = field != GetPartitionsMethod.TraverseCommonPartitions;
             }
         }
-
-
         public string StatusLogText
         {
             get => field;
@@ -83,11 +81,23 @@ namespace SPRDClient.Utils
                 OnPropertyChanged(nameof(SkipSignVerify));
             }
         }
+        public struct PartitionDisplay
+        {
+            public PartitionDisplay(Partition partition)
+            {
+                Name = partition.Name;
+                DisplaySize = (int)Math.Ceiling((decimal)partition.Size / (1UL << partition.IndicesToMB));
+            }
+            public string Name { get; set; }
+            public int DisplaySize { get; set; }
+        }
+
         public int Timeout { get => sprdFlashUtils.Timeout; set { sprdFlashUtils.Timeout = value; OnPropertyChanged(nameof(Timeout)); } }
         public bool Verbose { get => sprdFlashUtils.Verbose; set { sprdFlashUtils.Verbose = value; OnPropertyChanged(nameof(Verbose)); } }
         public string SaveFileDirectory { get => field; set { field = value; OnPropertyChanged(nameof(SaveFileDirectory)); } } = Environment.CurrentDirectory;
+       
         public List<Partition> partitions = [];
-
+        public ObservableCollection<PartitionDisplay> DisplayPartitions { get;private set; } = [];
         public bool isActing { get; private set; } = false;
         private bool isReadingPartition = false;
 
@@ -521,6 +531,11 @@ namespace SPRDClient.Utils
                 catch (OperationCanceledException)
                 {
                 }
+                catch (Exception ex)
+                {
+                    snackbarService.Show("Fdl2阶段操作失败", $"备份全机时发生异常！\n错误:{ex.Message}", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle12), new TimeSpan(0, 0, 0, 6));
+                    await CheckConfirm("备份全机失败", $"备份全机时发生异常！\n错误:{ex.Message}", "忽略", string.Empty);
+                }
                 isActing = false;
                 isReadingPartition = false;
                 btn.Content = originContent;
@@ -543,23 +558,31 @@ namespace SPRDClient.Utils
                     string[] files = Directory.GetFiles(openFolderDialog.FolderName, "SPRD-Backup-*.img");
                     isActing = true;
                     btn.IsEnabled = false;
-                    await Task.Run(() =>
+                    try
                     {
-                        foreach (string file in files)
+                        await Task.Run(() =>
                         {
-                            string partName = file.Split(new[] { "SPRD-Backup-", ".img" }, StringSplitOptions.RemoveEmptyEntries)[1];
-                            if (partName == "ubipac" || partName == "userdata" || partName == "cache") continue;
-                            Application.Current.Dispatcher.BeginInvoke(() => snackbarService.Show("Fdl2阶段分区操作", $"开始写入{partName}分区", ControlAppearance.Info, new SymbolIcon(SymbolRegular.ArrowDownload16), new TimeSpan(0, 0, 0, 2)), System.Windows.Threading.DispatcherPriority.ContextIdle);
-                            sprdFlashUtils.WritePartition(partName, File.OpenRead(file));
-                            Application.Current.Dispatcher.BeginInvoke(() => snackbarService.Show("Fdl2阶段分区操作", $"{partName}分区写入完成", ControlAppearance.Info, new SymbolIcon(SymbolRegular.ArrowDownload16), new TimeSpan(0, 0, 0, 2)), System.Windows.Threading.DispatcherPriority.ContextIdle);
-                        }
-                    });
+                            foreach (string file in files)
+                            {
+                                string partName = file.Split(new[] { "SPRD-Backup-", ".img" }, StringSplitOptions.RemoveEmptyEntries)[1];
+                                if (partName == "ubipac" || partName == "userdata" || partName == "cache") continue;
+                                Application.Current.Dispatcher.BeginInvoke(() => snackbarService.Show("Fdl2阶段分区操作", $"开始写入{partName}分区", ControlAppearance.Info, new SymbolIcon(SymbolRegular.ArrowDownload16), new TimeSpan(0, 0, 0, 2)), System.Windows.Threading.DispatcherPriority.ContextIdle);
+                                sprdFlashUtils.WritePartition(partName, File.OpenRead(file));
+                                Application.Current.Dispatcher.BeginInvoke(() => snackbarService.Show("Fdl2阶段分区操作", $"{partName}分区写入完成", ControlAppearance.Info, new SymbolIcon(SymbolRegular.ArrowDownload16), new TimeSpan(0, 0, 0, 2)), System.Windows.Threading.DispatcherPriority.ContextIdle);
+                            }
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        snackbarService.Show("Fdl2阶段操作失败", $"恢复备份时发生异常！\n错误:{ex.Message}", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle12), new TimeSpan(0, 0, 0, 6));
+                        await CheckConfirm("恢复备份失败", $"恢复备份时发生异常！\n错误:{ex.Message}", "忽略", string.Empty);
+                    }
                     isActing = false;
                     btn.IsEnabled = true;
                 }
             }
         }
-        public async void FactoryResetButton_Click(object sender, RoutedEventArgs e)
+        public async void FactoryResetButton_Click(object sender)
         {
             if (isActing)
             {
@@ -567,11 +590,19 @@ namespace SPRDClient.Utils
                 return;
             }
             isActing = true;
-            await Task.Run(() => sprdFlashUtils.ResetToCustomMode(CustomModesToReset.FactoryReset));
+            try
+            {
+                await Task.Run(() => sprdFlashUtils.ResetToCustomMode(CustomModesToReset.FactoryReset));
+            }
+            catch (Exception ex)
+            {
+                snackbarService.Show("Fdl2阶段操作失败", $"启用开机自动恢复出厂设置时发生异常！\n错误:{ex.Message}", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle12), new TimeSpan(0, 0, 0, 6));
+                await CheckConfirm("操作失败", $"启用开机自动恢复出厂设置时发生异常！\n错误:{ex.Message}", "忽略", string.Empty);
+            }
             isActing = false;
             snackbarService.Show("操作成功", "已尝试启用开机自动恢复出厂设置", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Save16), new TimeSpan(0, 0, 0, 2));
         }
-        public async void ResetToRecoveryButton_Click(object sender, RoutedEventArgs e)
+        public async void ResetToRecoveryButton_Click(object sender)
         {
             if (isActing)
             {
@@ -579,11 +610,19 @@ namespace SPRDClient.Utils
                 return;
             }
             isActing = true;
-            await Task.Run(() => sprdFlashUtils.ResetToCustomMode(CustomModesToReset.Recovery));
+            try
+            {
+                await Task.Run(() => sprdFlashUtils.ResetToCustomMode(CustomModesToReset.Recovery));
+            }
+            catch (Exception ex)
+            {
+                snackbarService.Show("Fdl2阶段操作失败", $"启用开机自动进入Rec时发生异常！\n错误:{ex.Message}", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle12), new TimeSpan(0, 0, 0, 6));
+                await CheckConfirm("操作失败", $"启用开机自动进入Rec时发生异常！\n错误:{ex.Message}", "忽略", string.Empty);
+            }
             isActing = false;
             snackbarService.Show("操作成功", "已尝试开机自动进入Recovery模式", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Save16), new TimeSpan(0, 0, 0, 2));
         }
-        public async void ResetToFastbootdButton_Click(object sender, RoutedEventArgs e)
+        public async void ResetToFastbootdButton_Click(object sender)
         {
             if (sender is Wpf.Ui.Controls.Button button)
             {
@@ -594,13 +633,21 @@ namespace SPRDClient.Utils
                 }
                 isActing = true;
                 button.IsEnabled = false;
-                await Task.Run(() => sprdFlashUtils.ResetToCustomMode(CustomModesToReset.Fastboot));
+                try
+                {
+                    await Task.Run(() => sprdFlashUtils.ResetToCustomMode(CustomModesToReset.Fastboot));
+                }
+                catch (Exception ex)
+                {
+                    snackbarService.Show("Fdl2阶段操作失败", $"启用开机时进入fastboot时发生异常！\n错误:{ex.Message}", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle12), new TimeSpan(0, 0, 0, 6));
+                    await CheckConfirm("启用开机时进入fastboot失败", $"启用开机时进入fastboot时发生异常！\n错误:{ex.Message}", "忽略", string.Empty);
+                }
                 isActing = false;
                 button.IsEnabled = true;
                 snackbarService.Show("操作成功", "已尝试开机自动进入Fastbootd模式", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Save16), new TimeSpan(0, 0, 0, 2));
             }
         }
-        public async void EnableDmButton_Click(object sender, RoutedEventArgs e)
+        public async void EnableDmButton_Click(object sender)
         {
             if (sender is Wpf.Ui.Controls.Button button)
             {
@@ -612,13 +659,22 @@ namespace SPRDClient.Utils
                 }
                 isActing = true;
                 button.IsEnabled = false;
-                await Task.Run(() => sprdFlashUtils.SetDmVerityStatus(true, GetPartitionListWithoutSplloader()));
+                try
+                {
+                    await Task.Run(() => sprdFlashUtils.SetDmVerityStatus(true, GetPartitionListWithoutSplloader()));
+
+                }
+                catch (Exception ex)
+                {
+                    snackbarService.Show("Fdl2阶段操作失败", $"启用DM-Verity时发生异常！\n错误:{ex.Message}", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle12), new TimeSpan(0, 0, 0, 6));
+                    await CheckConfirm("启用DM-Verity失败", $"启用DM-Verity时发生异常！\n错误:{ex.Message}", "忽略", string.Empty);
+                }
                 isActing = false;
                 button.IsEnabled = true;
                 snackbarService.Show("操作成功", "已尝试启用DM-Verity", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Save16), new TimeSpan(0, 0, 0, 2));
             }
         }
-        public async void DisableDmButton_Click(object sender, RoutedEventArgs e)
+        public async void DisableDmButton_Click(object sender)
         {
             if (sender is Wpf.Ui.Controls.Button button)
             {
@@ -629,10 +685,43 @@ namespace SPRDClient.Utils
                 }
                 isActing = true;
                 button.IsEnabled = false;
-                await Task.Run(() => sprdFlashUtils.SetDmVerityStatus(false, GetPartitionListWithoutSplloader()));
+                try
+                {
+                    await Task.Run(() => sprdFlashUtils.SetDmVerityStatus(false, GetPartitionListWithoutSplloader()));
+                }
+                catch (Exception ex)
+                {
+                    snackbarService.Show("Fdl2阶段操作失败", $"禁用DM-Verity时发生异常！\n错误:{ex.Message}", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle12), new TimeSpan(0, 0, 0, 6));
+                    await CheckConfirm("禁用DM-Verity失败", $"禁用DM-Verity时发生异常！\n错误:{ex.Message}", "忽略", string.Empty);
+                }
                 isActing = false;
                 button.IsEnabled = true;
                 snackbarService.Show("操作成功", "已尝试禁用DM-Verity", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Save16), new TimeSpan(0, 0, 0, 2));
+            }
+        }
+        public async void SetActiveButton_Click(object sender, SlotToSetActive slot)
+        {
+            if (sender is Wpf.Ui.Controls.Button button)
+            {
+                if (isActing)
+                {
+                    snackbarService.Show("警告", $"当前正在进行其他操作，无法执行此操作!", ControlAppearance.Caution, new SymbolIcon(SymbolRegular.Info12), new TimeSpan(0, 0, 0, 3));
+                    return;
+                }
+                isActing = true;
+                button.IsEnabled = false;
+                try
+                {
+                    await Task.Run(() => sprdFlashUtils.SetActiveSlot(slot));
+                }
+                catch (Exception ex)
+                {
+                    snackbarService.Show("Fdl2阶段操作失败", $"设置{slot}为活动槽位时发生异常！\n错误:{ex.Message}", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle12), new TimeSpan(0, 0, 0, 6));
+                    await CheckConfirm($"设置{slot}为活动槽位失败", $"设置{slot}为活动槽位时发生异常！\n错误:{ex.Message}", "忽略", string.Empty);
+                }
+                isActing = false;
+                button.IsEnabled = true;
+                snackbarService.Show("操作成功", $"已尝试设置{slot}为活动槽位", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Save16), new TimeSpan(0, 0, 0, 2));
             }
         }
     }

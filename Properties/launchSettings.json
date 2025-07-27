@@ -2,6 +2,7 @@
   "profiles": {
     "SPRDClient": {
       "commandName": "Project",
+      "commandLineArgs": "debug --highlevel",
       "nativeDebugging": false
     }
   }

@@ -237,22 +237,44 @@ namespace SPRDClient.Pages
                                 if (partitions.Count > 0)
                                     await Task.Run(() => flashModel.sprdFlashUtils.Repartition(partitions));
                                 flashModel.snackbarService.Show("重新分区成功", $"已重新分区（分区数：{partitions.Count}）", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Save16), new TimeSpan(0, 0, 0, 4));
+                                partitions.Insert(0, new Partition() { Name = "splloader", Size = flashModel.sprdFlashUtils.GetPartitionSize("splloader"), IndicesToMB = 20 });
+                                var ud = (from p in flashModel.DisplayPartitions
+                                          where p.Name == "userdata"
+                                          select p).FirstOrDefault();
+                                List<FlashModel.PartitionDisplay> displayPartitions = new();
+                                foreach (var partition in partitions)
+                                {
+                                    
+                                    displayPartitions.Add(partition.Name == "userdata" ? ud : new FlashModel.PartitionDisplay(partition));
+                                }
+                                flashModel.DisplayPartitions.Clear();
+                                foreach (var item in displayPartitions)
+                                {
+                                    flashModel.DisplayPartitions.Add(item);
+                                }
+                                flashModel.partitions = partitions;
                             }
                             break;
                         case "disable dm-verity":
-                            flashModel.DisableDmButton_Click(sender, e);
+                            flashModel.DisableDmButton_Click(sender);
                             break;
                         case "enable dm-verity":
-                            flashModel.EnableDmButton_Click(sender, e);
+                            flashModel.EnableDmButton_Click(sender);
                             break;
                         case "recovery":
-                            flashModel.ResetToRecoveryButton_Click(sender, e);
+                            flashModel.ResetToRecoveryButton_Click(sender);
                             break;
-                        case "fastbootd":
-                            flashModel.ResetToFastbootdButton_Click(sender, e);
+                        case "fastboot":
+                            flashModel.ResetToFastbootdButton_Click(sender);
                             break;
                         case "factory reset":
-                            flashModel.FactoryResetButton_Click(sender, e);
+                            flashModel.FactoryResetButton_Click(sender);
+                            break;
+                        case "set active slota":
+                            flashModel.SetActiveButton_Click(sender,SlotToSetActive.SlotA);
+                            break;
+                        case "set active slotb":
+                            flashModel.SetActiveButton_Click(sender, SlotToSetActive.SlotB);
                             break;
                     }
         }

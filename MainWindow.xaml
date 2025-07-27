@@ -7,12 +7,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Width="300"
-    Height="600"
+    Height="700"
     Background="Transparent"
     ExtendsContentIntoTitleBar="True"
     Loaded="FluentWindow_Loaded"
     WindowCornerPreference="Round"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    >
     <Grid>
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
@@ -43,7 +44,7 @@
             </Grid.RowDefinitions>
             <ui:TitleBar
                 x:Name="TitleBar1"
-                Title="SPRDClient (工具免费) "
+                Title="SPRDClient (工具免费，最终版本) "
                 FontSize="15" />
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
@@ -154,6 +155,26 @@
                     Background="Transparent"
                     PlaceholderText="如0x5000"
                     Text="{Binding StrAddress}" />
+                <ui:TextBlock x:Name="ed0" Text="EXEC_ADDR 文件路径(选填)"/>
+                <ui:TextBox
+                    x:Name="ed1"
+                    Height="35"
+                    Margin="10"
+                    Background="Transparent"
+                    AllowDrop="True"
+                    PlaceholderText="跳过fdl签名验证文件路径(选填,拖拽到此处)"
+                    PreviewDragOver="TextBoxPreviewDragOver"
+                    PreviewDrop="TextBoxPreviewDrop"
+                    Text="{Binding ExecAddressFilePath,UpdateSourceTrigger=PropertyChanged}" />
+
+                <ui:TextBlock x:Name="ed2" Text="EXEC_ADDR 文件地址(选填)" />
+                <ui:TextBox
+                    x:Name="ed3"
+                    Height="35"
+                    Margin="10"
+                    Background="Transparent"
+                    PlaceholderText="如0x4ee8（选填）"
+                    Text="{Binding ExecAddressStr}" />
                 <ui:Button
                     x:Name="SendFdlButton"
                     Height="35"

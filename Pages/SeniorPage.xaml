@@ -49,13 +49,8 @@
         <Border
             Margin="5"
             CornerRadius="20"
-            Opacity="0.3">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0.0" Color="MediumPurple" />
-                    <GradientStop Offset="1.0" Color="IndianRed" />
-                </LinearGradientBrush>
-            </Border.Background>
+            Opacity="0.2" 
+            Background="Gray">
             <Border.Effect>
                 <BlurEffect Radius="8" />
             </Border.Effect>
@@ -64,13 +59,8 @@
             Grid.Row="1"
             Margin="5"
             CornerRadius="20"
-            Opacity="0.25">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0.0" Color="Blue" />
-                    <GradientStop Offset="1.0" Color="LightGreen" />
-                </LinearGradientBrush>
-            </Border.Background>
+            Opacity="0.2"
+            Background="Gray">
             <Border.Effect>
                 <BlurEffect Radius="8" />
             </Border.Effect>
@@ -79,13 +69,8 @@
             Grid.Row="2"
             Margin="5"
             CornerRadius="20"
-            Opacity="0.2">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0.0" Color="Firebrick" />
-                    <GradientStop Offset="1.0" Color="Orange" />
-                </LinearGradientBrush>
-            </Border.Background>
+            Opacity="0.2"
+            Background="Gray">
             <Border.Effect>
                 <BlurEffect Radius="8" />
             </Border.Effect>
@@ -265,8 +250,10 @@
                 <ui:Button Click="Button_Click_1" IsEnabled ="{Binding IsUsingNewFdl2}" Content="禁用dm-verity" Tag="disable dm-verity"/>
                 <ui:Button Click="Button_Click_1" IsEnabled ="{Binding IsUsingNewFdl2}" Content="启用dm-verity" Tag="enable dm-verity"/>
                 <ui:Button Click="Button_Click_1" Content="开机进入recovery" Tag="recovery"/>
-                <ui:Button Click="Button_Click_1" Content="开机进入fastbootd" Tag="fastbootd"/>
+                <ui:Button Click="Button_Click_1" Content="开机进入fastboot" Tag="fastboot"/>
                 <ui:Button Click="Button_Click_1" Content="开机恢复出厂设置" Tag="factory reset"/>
+                <ui:Button Click="Button_Click_1" Content="设置槽位A分区为活动分区" Tag="set active slota"/>
+                <ui:Button Click="Button_Click_1" Content="设置槽位B分区为活动分区" Tag="set active slotb"/>
             </WrapPanel>
         </GroupBox>
         <!--  日志区域  -->
