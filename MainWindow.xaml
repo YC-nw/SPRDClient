@@ -12,8 +12,7 @@
     ExtendsContentIntoTitleBar="True"
     Loaded="FluentWindow_Loaded"
     WindowCornerPreference="Round"
-    mc:Ignorable="d"
-    >
+    mc:Ignorable="d">
     <Grid>
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
@@ -86,21 +85,20 @@
                     <ui:TextBlock
                         Margin="7"
                         FontSize="18"
-                        Text="进入Sprd4模式"
+                        Text="无fdl刷机(谨慎使用)"
                         ToolTip="在没有fdl的情况下，可以开启此功能并在设备关机状态下直接连接设备以进入sprd4模式而不用发送fdl文件。 &#x0a;此功能在大部分展迅机型上正常工作，部分展迅设备可能会擦除splloader以进入sprd3，因此需谨慎使用。 &#x0a;较新的设备可尝试开启“单次模式”功能" />
                 </ui:ToggleSwitch>
-                <ui:ToggleSwitch
+                <RadioButton
                     x:Name="KickModeToggle"
                     Margin="10"
                     HorizontalAlignment="Center"
                     IsChecked="{Binding boolKickMode, UpdateSourceTrigger=PropertyChanged}"
                     Visibility="Collapsed">
                     <ui:TextBlock
-                        Margin="7"
                         FontSize="18"
                         Text="单次模式"
                         ToolTip="某些新展迅设备可能无法使用普通方法进入sprd4，可尝试开启此功能重试" />
-                </ui:ToggleSwitch>
+                </RadioButton>
                 <ui:ToggleSwitch
                     Margin="10"
                     HorizontalAlignment="Center"
@@ -155,17 +153,17 @@
                     Background="Transparent"
                     PlaceholderText="如0x5000"
                     Text="{Binding StrAddress}" />
-                <ui:TextBlock x:Name="ed0" Text="EXEC_ADDR 文件路径(选填)"/>
+                <ui:TextBlock x:Name="ed0" Text="EXEC_ADDR 文件路径(选填)" />
                 <ui:TextBox
                     x:Name="ed1"
                     Height="35"
                     Margin="10"
-                    Background="Transparent"
                     AllowDrop="True"
+                    Background="Transparent"
                     PlaceholderText="跳过fdl签名验证文件路径(选填,拖拽到此处)"
                     PreviewDragOver="TextBoxPreviewDragOver"
                     PreviewDrop="TextBoxPreviewDrop"
-                    Text="{Binding ExecAddressFilePath,UpdateSourceTrigger=PropertyChanged}" />
+                    Text="{Binding ExecAddressFilePath, UpdateSourceTrigger=PropertyChanged}" />
 
                 <ui:TextBlock x:Name="ed2" Text="EXEC_ADDR 文件地址(选填)" />
                 <ui:TextBox

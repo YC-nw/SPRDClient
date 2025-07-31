@@ -220,6 +220,7 @@ namespace SPRDClient
         }
         public async void ConnectToDeviceAsync()
         {
+            snackbarService.Show("提示", "将鼠标悬停在功能上方即可查看功能注意事项、详情与提示", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Info12), new TimeSpan(0, 0, 0, 5, 700));
             await Task.Run(() =>
             {
                 try
@@ -251,7 +252,7 @@ namespace SPRDClient
                     });
                     sprdProtocolHandler.Timeout = 1000;
                     var temp = sprdFlashUtils.ConnectToDevice(EnableReconnectMode);
-                    Dispatcher.BeginInvoke(() => AnimationControl.StartFadeOutAnimation(WaitingPanel));
+                    Dispatcher.BeginInvoke(() => AnimationControl.StartFadeOutAnimation(WaitingPanel),System.Windows.Threading.DispatcherPriority.Background);
                     SprdVersion = temp.SprdMode;
                     Stage = temp.Stage;
                     DeviceConnected = true;
@@ -278,7 +279,7 @@ namespace SPRDClient
                                     Stage == 0 ?
                                     StringToUint(config.Fdl1ToSendAddress)
                                     :
-                                    StringToUint(config.Fdl2ToSendAddress));
+                                    StringToUint(config.Fdl2ToSendAddress)); 
                                 Dispatcher.BeginInvoke(() => snackbarService.Show($"{Stage.ToString()}阶段操作成功", $"已发送{Path.GetFileName(FdlFilePath)}", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Send16), new TimeSpan(0, 0, 0, 1, 700)));
                                 sprdFlashUtils.ExecuteDataAndConnect(Stage);
                                 Dispatcher.BeginInvoke(() => snackbarService.Show($"{Stage.ToString()}阶段操作成功", $"已连接{Stage.ToString()}", ControlAppearance.Success, new SymbolIcon(SymbolRegular.Send16), new TimeSpan(0, 0, 0, 1, 700)));
