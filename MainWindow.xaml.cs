@@ -39,8 +39,8 @@ namespace SPRDClient
                 else AnimationControl.StartFadeOutAnimation(KickModeToggle);
             }
         } = false;
-        public bool boolKickMode { get => field; set { field = value; KickMode = value ? ModeOfChangingDiagnostic.CustomOneTimeMode : ModeOfChangingDiagnostic.CommonMode; } }
-        private ModeOfChangingDiagnostic KickMode = ModeOfChangingDiagnostic.CommonMode;
+        public bool boolKickMode { get => field; set { field = value; KickMode = value ? MethodOfChangingDiagnostic.CustomOneTimeMode : MethodOfChangingDiagnostic.CommonMode; } }
+        private MethodOfChangingDiagnostic KickMode = MethodOfChangingDiagnostic.CommonMode;
         public bool AutoSend
         {
             get; set;
